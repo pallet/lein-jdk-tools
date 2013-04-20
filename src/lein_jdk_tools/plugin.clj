@@ -27,4 +27,11 @@
 
 (defn middleware
   [project]
-  (update-in project [:resource-paths] concat (jpda-jars)))
+  (-> project
+      (update-in [:resource-paths] concat (jpda-jars))
+      ;; Adding the jars to :resource-paths will result in their being included
+      ;; in any jars you create. Since there's never really a reason to
+      ;; include one jar in another, we'll just exclude these two jars by
+      ;; their regular name (which is the only way :jar-exclusions will properly
+      ;; catch and exclude them).
+      (update-in [:jar-exclusions] concat [#"tools.jar" #"sa-jdi.jar"])))
